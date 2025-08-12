@@ -26,7 +26,7 @@ def save_vm_data(data):
         json.dump(data, f, indent=4)
 
 class CreateVMRequest(BaseModel):
-    auto_delete_minutes: int = 0  # 0 means no auto-delete
+    auto_delete_minutes: int = 0 
 
 @app.post("/create-vm")
 def create_vm(req: CreateVMRequest):
@@ -43,7 +43,6 @@ def create_vm(req: CreateVMRequest):
     except subprocess.CalledProcessError as e:
         raise HTTPException(status_code=500, detail=f"Pulumi up failed: {e.stdout}")
 
-    # Extract IP address from stdout using regex
     ip_match = re.search(r'public_ip:\s*"?(?P<ip>(?:\d{1,3}\.){3}\d{1,3})"?', result.stdout)
     print(result.stdout)
     if not ip_match:

@@ -1,11 +1,9 @@
 import pulumi
 import pulumi_azure_native as az
 
-# Resource Group
 # rg = az.resources.ResourceGroup("win11-rg", location="polandcentral")
 rg = az.resources.ResourceGroup("win11-rg", location="swedencentral")
 
-# Public IP
 public_ip = az.network.PublicIPAddress(
     "win11-ip",
     resource_group_name=rg.name,
@@ -14,7 +12,6 @@ public_ip = az.network.PublicIPAddress(
     sku=az.network.PublicIPAddressSkuArgs(name="Standard")
 )
 
-# NIC
 subnet = az.network.Subnet(
     "win11-subnet",
     resource_group_name=rg.name,
@@ -69,7 +66,6 @@ nic = az.network.NetworkInterface(
     )]
 )
 
-# VM
 vm = az.compute.VirtualMachine(
     "win11-vm",
     resource_group_name=rg.name,
@@ -79,21 +75,22 @@ vm = az.compute.VirtualMachine(
     network_profile=az.compute.NetworkProfileArgs(
         network_interfaces=[az.compute.NetworkInterfaceReferenceArgs(id=nic.id)]
     ),
-    os_profile=az.compute.OSProfileArgs(
-        computer_name="win11vm",
-        admin_username="TestAdmin",
-        admin_password="TestAdmin123",
-        windows_configuration=az.compute.WindowsConfigurationArgs(
-            enable_automatic_updates=True,
-            provision_vm_agent=True
-        )
-    ),
+    # os_profile=az.compute.OSProfileArgs(
+    #     computer_name="win11vm",
+    #     admin_username="TestAdmin",  # Just for the demo
+    #     admin_password="TestAdmin123",
+    #     windows_configuration=az.compute.WindowsConfigurationArgs(
+    #         enable_automatic_updates=True,
+    #         provision_vm_agent=True
+    #     )
+    # ),
     storage_profile=az.compute.StorageProfileArgs(
         image_reference=az.compute.ImageReferenceArgs(
-            publisher="microsoftwindowsdesktop",
-            offer="windows-11",
-            sku="win11-24h2-pro",
-            version="latest"
+            # publisher="microsoftwindowsdesktop",
+            # offer="windows-11",
+            # sku="win11-24h2-pro",
+            # version="latest"
+            id="/subscriptions/8ae879e3-5e4e-42be-95ea-37f65a44b839/resourceGroups/gamevm-test-1/providers/Microsoft.Compute/galleries/GP_test_image_gallery/images/GP_test_image"
         ),
         os_disk=az.compute.OSDiskArgs(
             create_option="FromImage",
@@ -115,5 +112,4 @@ az.compute.VirtualMachineExtension("amd-gpu-drivers",
     auto_upgrade_minor_version=True
 )
 
-# Export IP directly from the PublicIPAddress resource
 pulumi.export("public_ip", public_ip.ip_address)
